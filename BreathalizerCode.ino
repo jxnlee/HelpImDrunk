@@ -1,9 +1,11 @@
 const int breath_pin = A0;
 const int button_pin = 2;
-const int breathe_led_pin = 13;
+const int breathe_led_pin = 11;
 const int calibrate_led_pin = 12;
+const int emergency_contact_pin = 13;
 const int record_duration = 5;
 const int calibrate_duration = 2;
+const int drunk_threshold = 150;
 int breath_level;
 int base_reading;
 int button_state = 0;
@@ -15,6 +17,7 @@ void setup()
   pinMode(button_pin, INPUT);
   pinMode(breathe_led_pin, OUTPUT);
   pinMode(calibrate_led_pin, OUTPUT);
+  pinMode(emergency_contact_pin, OUTPUT);
 }
 
 void loop() 
@@ -23,12 +26,17 @@ void loop()
   button_state = digitalRead(button_pin);
   if(button_state == HIGH)
   {
-    record_breath();
+    int breath_val = record_breath();
+    if (breath_val > drunk_threshold) {
+        digitalWrite(emergency_contact_pin, HIGH);
+        Serial.println("Your emergency contact has been reached. Take care");
+        exit(0);
+    }
   }
   
 }
 
-void record_breath()
+int record_breath()
 {
   int highest_input = 0;
   double calibration = 0.0;
@@ -53,4 +61,6 @@ void record_breath()
   }
   digitalWrite(breathe_led_pin, LOW);
   Serial.println(highest_input);
+
+  return highest_input;
 }
