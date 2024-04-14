@@ -20,7 +20,7 @@ void setup()
 {
   // put your setup code here, to run once:
   Serial.begin(9600);
-  lcd.begin(16, 1);
+  lcd.begin(16, 2);
   pinMode(breath_pin, INPUT);
   pinMode(button_pin, INPUT);
   pinMode(breathe_led_pin, OUTPUT);
@@ -36,12 +36,16 @@ void loop()
   if(button_state == HIGH)
   {
     int breath_val = record_breath();
+    lcd.clear();
+    lcd.print(breath_val);
+    lcd.setCursor(0, 1);
     if (breath_val > drunk_threshold) {
         digitalWrite(emergency_contact_pin, HIGH);
-        lcd.clear();
-        lcd.print("Your emergency contact is being reached. Take care");
+        lcd.print("You are drunk");
         exit(0);
         while(1) {} // exit
+    } else {
+      lcd.print("Take some shots");
     }
   }
   
